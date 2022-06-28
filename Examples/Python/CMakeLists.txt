@@ -149,12 +149,26 @@ configure_file(setup.sh.in ${_python_dir}/setup.sh @ONLY)
 install(FILES setup.sh.in DESTINATION "python" RENAME setup.sh)
 
 foreach(f ${py_files})
-set(_target ${_python_dir}/acts/${f})
-get_filename_component(_dir ${_target} DIRECTORY)
-file(MAKE_DIRECTORY ${_dir})
+  set(_target ${_python_dir}/acts/${f})
+  get_filename_component(_dir ${_target} DIRECTORY)
+  file(MAKE_DIRECTORY ${_dir})
 
-file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/python/acts/${f} ${_target} SYMBOLIC)
+  file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/python/acts/${f} ${_target} SYMBOLIC)
 endforeach()
+
+# install runnable examples
+set(_runable_examples simulation/fatras) # expand here (possibly conditionally)
+
+foreach( e ${_runable_examples} )
+  file(MAKE_DIRECTORY ${_python_dir}/acts/examples/${e})
+  file(GLOB _ex_files ${CMAKE_CURRENT_SOURCE_DIR}/python/acts/examples/${e}/*)
+  foreach(f ${_ex_files})
+    get_filename_component(_fname ${f} NAME)
+    file(CREATE_LINK ${f} ${_python_dir}/acts/examples/${e}/${_fname} SYMBOLIC)  
+  endforeach()
+
+endforeach()
+
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/acts/ DESTINATION ${_python_install_dir})
 
