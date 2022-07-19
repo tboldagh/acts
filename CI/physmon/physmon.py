@@ -19,11 +19,17 @@ import acts.examples
 acts.logging.setFailureThreshold(acts.logging.FATAL)
 
 from truth_tracking_kalman import runTruthTrackingKalman
-from ckf_tracks import addCKFTracks, CKFPerformanceConfig
 from fatras import addFatras
-from digitization import addDigitization
-from particle_gun import addParticleGun, EtaConfig, PhiConfig, ParticleConfig
-from seeding import (
+from acts.examples.simulation import (
+    addParticleGun,
+    EtaConfig,
+    PhiConfig,
+    ParticleConfig,
+    addDigitization,
+)
+from acts.examples.reconstruction import (
+    addCKFTracks,
+    CKFPerformanceConfig,
     addSeeding,
     TruthSeedRanges,
     ParticleSmearingSigmas,
