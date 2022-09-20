@@ -14,6 +14,22 @@
 #include <memory>
 
 namespace Acts {
+struct SeedFinderOrthogonalContext {
+  // location of beam in x,y plane.
+  // used as offset for Space Points
+  Acts::Vector2 beamPos{0 * Acts::UnitConstants::mm,
+                        0 * Acts::UnitConstants::mm};
+
+  SeedFinderOrthogonalContext toInternalUnits() const {
+    SeedFinderOrthogonalContext context = *this;
+    using namespace Acts::UnitLiterals;
+    context.beamPos[0] /= 1_mm;
+    context.beamPos[1] /= 1_mm;
+    return context;
+  }
+
+};
+
 // forward declaration to avoid cyclic dependence
 template <typename T>
 class SeedFilter;
@@ -69,10 +85,6 @@ struct SeedFinderOrthogonalConfig {
   float deltaPhiMax = 0.085;
 
   float bFieldInZ = 2.08 * Acts::UnitConstants::T;
-  // location of beam in x,y plane.
-  // used as offset for Space Points
-  Acts::Vector2 beamPos{0 * Acts::UnitConstants::mm,
-                        0 * Acts::UnitConstants::mm};
 
   // average radiation lengths of material on the length of a seed. used for
   // scattering.
@@ -105,9 +117,6 @@ struct SeedFinderOrthogonalConfig {
     config.rMax /= 1_mm;
     config.rMin /= 1_mm;
     config.bFieldInZ /= 1000. * 1_T;
-
-    config.beamPos[0] /= 1_mm;
-    config.beamPos[1] /= 1_mm;
 
     return config;
   }

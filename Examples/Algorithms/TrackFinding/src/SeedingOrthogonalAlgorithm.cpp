@@ -57,8 +57,6 @@ ActsExamples::SeedingOrthogonalAlgorithm::SeedingOrthogonalAlgorithm(
   m_cfg.seedFinderConfig.radLengthPerSeed = m_cfg.radLengthPerSeed;
   m_cfg.seedFinderConfig.minPt = m_cfg.minPt;
   m_cfg.seedFinderConfig.bFieldInZ = m_cfg.bFieldInZ;
-  m_cfg.seedFinderConfig.beamPos =
-      Acts::Vector2(m_cfg.beamPosX, m_cfg.beamPosY);
   m_cfg.seedFinderConfig.impactMax = m_cfg.impactMax;
 
   // calculation of scattering using the highland formula

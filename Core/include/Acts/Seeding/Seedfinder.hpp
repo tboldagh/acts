@@ -69,6 +69,7 @@ class Seedfinder {
   /// Create all seeds from the space points in the three iterators.
   /// Can be used to parallelize the seed creation
   /// @param state State object that holds memory used
+  /// @param context Auxiliary information about the event
   /// @param outIt Output iterator for the seeds in the group
   /// @param bottomSPs group of space points to be used as innermost SP in a seed.
   /// @param middleSPs group of space points to be used as middle SP in a seed.
@@ -78,6 +79,7 @@ class Seedfinder {
   /// @note Ranges must be separate objects for each parallel call.
   template <template <typename...> typename container_t, typename sp_range_t>
   void createSeedsForGroup(
+      const Acts::SeedfinderContext& context,
       State& state,
       std::back_insert_iterator<container_t<Seed<external_spacepoint_t>>> outIt,
       sp_range_t bottomSPs, sp_range_t middleSPs, sp_range_t topSPs,
@@ -95,6 +97,7 @@ class Seedfinder {
   /// require backwards-compatibility.
   ///
   /// @tparam sp_range_t container type for the seed point collections.
+  /// @param context Auxiliary information about the event
   /// @param bottomSPs group of space points to be used as innermost SP in a
   /// seed.
   /// @param middleSPs group of space points to be used as middle SP in a seed.
@@ -102,6 +105,7 @@ class Seedfinder {
   /// @returns a vector of seeds.
   template <typename sp_range_t>
   std::vector<Seed<external_spacepoint_t>> createSeedsForGroup(
+      const Acts::SeedfinderContext& context,
       sp_range_t bottomSPs, sp_range_t middleSPs, sp_range_t topSPs) const;
 
  private:

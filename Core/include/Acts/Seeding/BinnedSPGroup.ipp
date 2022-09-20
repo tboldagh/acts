@@ -15,7 +15,8 @@ Acts::BinnedSPGroup<external_spacepoint_t>::BinnedSPGroup(
     std::shared_ptr<Acts::BinFinder<external_spacepoint_t>> botBinFinder,
     std::shared_ptr<Acts::BinFinder<external_spacepoint_t>> tBinFinder,
     std::unique_ptr<SpacePointGrid<external_spacepoint_t>> grid,
-    const SeedfinderConfig<external_spacepoint_t>& _config) {
+    const SeedfinderConfig<external_spacepoint_t>& _config, 
+    const SeedfinderContext& context) {
   auto config = _config.toInternalUnits();
   static_assert(
       std::is_same<
@@ -34,7 +35,7 @@ Acts::BinnedSPGroup<external_spacepoint_t>::BinnedSPGroup(
   // create number of bins equal to number of millimeters rMax
   // (worst case minR: configured minR + 1mm)
   // binSizeR allows to increase or reduce numRBins if needed
-  size_t numRBins = (config.rMax + config.beamPos.norm()) / config.binSizeR;
+  size_t numRBins = (config.rMax + context.beamPos.norm()) / config.binSizeR;
   std::vector<
       std::vector<std::unique_ptr<InternalSpacePoint<external_spacepoint_t>>>>
       rBins(numRBins);
@@ -59,7 +60,7 @@ Acts::BinnedSPGroup<external_spacepoint_t>::BinnedSPGroup(
     }
 
     auto isp = std::make_unique<InternalSpacePoint<external_spacepoint_t>>(
-        sp, spPosition, config.beamPos, variance);
+        sp, spPosition, context.beamPos, variance);
     // calculate r-Bin index and protect against overflow (underflow not
     // possible)
     size_t rIndex = isp->radius() / config.binSizeR;

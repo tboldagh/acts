@@ -17,6 +17,22 @@
 
 namespace Acts {
 
+
+// input to seed finder that possibly changes from event to event
+struct SeedfinderContext {
+  // location of beam in x,y plane.
+  // used as offset for Space Points
+  Acts::Vector2 beamPos{0 * Acts::UnitConstants::mm,
+                        0 * Acts::UnitConstants::mm};
+
+  SeedfinderContext toInternalUnits() const {
+    SeedfinderContext context = *this;
+    using namespace Acts::UnitLiterals;
+    context.beamPos[0] /= 1_mm;
+    context.beamPos[1] /= 1_mm;
+    return context;
+  }
+};
 // forward declaration to avoid cyclic dependence
 template <typename T>
 class SeedFilter;
@@ -117,10 +133,6 @@ struct SeedfinderConfig {
   float rMin = 33 * Acts::UnitConstants::mm;
 
   float bFieldInZ = 2.08 * Acts::UnitConstants::T;
-  // location of beam in x,y plane.
-  // used as offset for Space Points
-  Acts::Vector2 beamPos{0 * Acts::UnitConstants::mm,
-                        0 * Acts::UnitConstants::mm};
 
   std::vector<size_t> zBinsCustomLooping = {};
 
@@ -197,8 +209,6 @@ struct SeedfinderConfig {
     config.bFieldInZ /= 1000. * 1_T;
     config.deltaZMax /= 1_mm;
 
-    config.beamPos[0] /= 1_mm;
-    config.beamPos[1] /= 1_mm;
 
     config.zAlign /= 1_mm;
     config.rAlign /= 1_mm;

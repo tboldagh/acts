@@ -101,7 +101,6 @@ void addTrackFinding(Context& ctx) {
     ACTS_PYTHON_MEMBER(rMax);
     ACTS_PYTHON_MEMBER(rMin);
     ACTS_PYTHON_MEMBER(bFieldInZ);
-    ACTS_PYTHON_MEMBER(beamPos);
     ACTS_PYTHON_MEMBER(radLengthPerSeed);
     ACTS_PYTHON_MEMBER(zAlign);
     ACTS_PYTHON_MEMBER(rAlign);
@@ -173,7 +172,6 @@ void addTrackFinding(Context& ctx) {
     ACTS_PYTHON_MEMBER(rMax);
     ACTS_PYTHON_MEMBER(rMin);
     ACTS_PYTHON_MEMBER(bFieldInZ);
-    ACTS_PYTHON_MEMBER(beamPos);
     ACTS_PYTHON_MEMBER(radLengthPerSeed);
     ACTS_PYTHON_MEMBER(rMinMiddle);
     ACTS_PYTHON_MEMBER(rMaxMiddle);

@@ -217,9 +217,10 @@ ActsExamples::ProcessCode ActsExamples::SeedingAlgorithm::execute(
                                      m_cfg.numPhiNeighbors));
   auto grid =
       Acts::SpacePointGridCreator::createGrid<SimSpacePoint>(m_cfg.gridConfig);
+  auto context = Acts::SeedfinderContext();
   auto spacePointsGrouping = Acts::BinnedSPGroup<SimSpacePoint>(
       spacePointPtrs.begin(), spacePointPtrs.end(), extractGlobalQuantities,
-      bottomBinFinder, topBinFinder, std::move(grid), m_cfg.seedFinderConfig);
+      bottomBinFinder, topBinFinder, std::move(grid), m_cfg.seedFinderConfig, context);
   auto finder = Acts::Seedfinder<SimSpacePoint>(m_cfg.seedFinderConfig);
 
   // run the seeding
@@ -230,7 +231,7 @@ ActsExamples::ProcessCode ActsExamples::SeedingAlgorithm::execute(
   auto group = spacePointsGrouping.begin();
   auto groupEnd = spacePointsGrouping.end();
   for (; !(group == groupEnd); ++group) {
-    finder.createSeedsForGroup(state, std::back_inserter(seeds), group.bottom(),
+    finder.createSeedsForGroup(context, state, std::back_inserter(seeds), group.bottom(),
                                group.middle(), group.top(), rRangeSPExtent);
   }
 
