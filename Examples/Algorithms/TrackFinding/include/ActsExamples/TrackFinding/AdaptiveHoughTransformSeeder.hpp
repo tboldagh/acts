@@ -65,6 +65,8 @@ class AdaptiveHoughTransformSeeder final : public IAlgorithm {
                                 // find less solutions
     bool deduplicate = true;    // when adding solutions try avoiding duplicates
 
+    uint32_t maxDivision = 8;    // Level of maximal section division
+
     double inverseA =
         1.0 / 3.0e-4;  // Assume B = 2T constant. Can apply corrections to
                        // this with fieldCorrection function

@@ -434,19 +434,14 @@ def addSeeding(
             seeds = addHoughTransformSeeding(s, houghTransformConfig, logLevel)
         elif seedingAlgorithm == SeedingAlgorithm.AdaptiveHoughTransform:
             logger.info("Using Adaptive Hough Transform seeding")
-            adaptiveHoughTransformConfig.inputSpacePoints = [spacePoints]
-            adaptiveHoughTransformConfig.outputProtoTracks = "protoTracks"
+            if adaptiveHoughTransformConfig is None:
+                adaptiveHoughTransformConfig = acts.examples.AdaptiveHoughTransformSeeder.Config()
+            
+            adaptiveHoughTransformConfig.inputSpacePoints = spacePoints
+            #adaptiveHoughTransformConfig.outputProtoTracks = "protoTracks"
             adaptiveHoughTransformConfig.outputSeeds = "seeds"
             adaptiveHoughTransformConfig.trackingGeometry = trackingGeometry
-            adaptiveHoughTransformConfig.threshold = 4
-            adaptiveHoughTransformConfig.noiseThreshold = 12
-            adaptiveHoughTransformConfig.phiMinBinSize = 3.14 / (2.0 * 257.0)
-            adaptiveHoughTransformConfig.qOverPtMinBinSize = 1.1 / (2.0 * 257.0)
-            adaptiveHoughTransformConfig.qOverPtMin = 1.1
-            adaptiveHoughTransformConfig.doSecondPhase = True
-            adaptiveHoughTransformConfig.zMinBinSize = 1 * u.mm
-            adaptiveHoughTransformConfig.cotThetaMinBinSize = 0.1
-            adaptiveHoughTransformConfig.deduplicate = True
+            
             seeds = addAdaptiveHoughTransformSeeding(
                 s, adaptiveHoughTransformConfig, logLevel=logLevel
             )

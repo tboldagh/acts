@@ -59,6 +59,7 @@ ProcessCode AdaptiveHoughTransformSeeder::execute(
     const AlgorithmContext &ctx) const {
   const SpacePointContainer &spacePoints = m_inputSpacePoints(ctx);
 
+  ACTS_INFO("Starting maxDivision value: " << m_cfg.maxDivision);
   // get inputs
   std::vector<PreprocessedMeasurement> measurements;
   preparePreprocessedMeasurements(spacePoints, measurements);
@@ -215,6 +216,7 @@ void AdaptiveHoughTransformSeeder::processStackQOverPtPhi(
     int nLines{};
     int discardedByThresholdCut{};
     int discardedByCrossingCut{};
+    int discardedByGeometryCut{};
   };
   std::map<int, Stats> sStat;
   ExplorationOptions opt;
@@ -227,19 +229,37 @@ void AdaptiveHoughTransformSeeder::processStackQOverPtPhi(
           const std::vector<PreprocessedMeasurement> &mes) {
         using enum HoughAccumulatorSection::Decision;
 
-        if (section.divisionLevel() <= 8) {
-          return Drill;
-        }
-
         if (section.count() < cfg.threshold) {
           sStat[section.divisionLevel()].discardedByThresholdCut += 1;
           return Discard;
         }
+
+        if (section.count()<=cfg.noiseThreshold){
+          float minR = 1/mes[section.indices()[0]].invr;
+          float maxR = minR;
+            
+          for (unsigned i = 1; i < section.count(); ++i) {
+              float r = 1/mes[section.indices()[i]].invr;
+              if (r < minR) minR = r;
+              if (r > maxR) maxR = r;
+          }
+            
+            
+          if ((maxR - minR) < 10.0 * Acts::UnitConstants::mm) {
+            sStat[section.divisionLevel()].discardedByGeometryCut += 1;
+            return Discard; 
+          }
+        }
+
         if (section.count() < 3 * cfg.threshold &&
             !passIntersectionsCheck(section, mes, opt.lineFunctor,
                                     cfg.threshold * (cfg.threshold - 1))) {
           sStat[section.divisionLevel()].discardedByCrossingCut += 1;
           return Discard;
+        }
+
+        if (section.divisionLevel() <= cfg.maxDivision) {
+          return Drill;
         }
 
         if (section.count() >= cfg.threshold &&
@@ -347,6 +367,8 @@ void AdaptiveHoughTransformSeeder::makeSeeds(
     const std::vector<PreprocessedMeasurement> &measurements) const {
   const SpacePointContainer &spacePoints = seeds.spacePointContainer();
 
+  unsigned int skippedCandidatesCounter = 0;
+
   std::size_t seedIndex = 0;
   for (const Acts::Experimental::HoughAccumulatorSection &s : solutions) {
     std::vector<unsigned> sortedIndices = s.indices();
@@ -374,6 +396,11 @@ void AdaptiveHoughTransformSeeder::makeSeeds(
       if (spIndex >= sp.size()) {
         break;
       }
+    }
+
+    if (spIndex<3){
+      skippedCandidatesCounter++;
+      continue;
     }
 
     auto cotThetaEstimate = static_cast<float>((sp[2]->z() - sp[0]->z()) /
@@ -410,6 +437,11 @@ void AdaptiveHoughTransformSeeder::makeSeeds(
 
     seedIndex++;
   }
+  if (skippedCandidatesCounter > 0) {
+    ACTS_INFO("Diagnostic: Skipped " << skippedCandidatesCounter 
+              << " invalid seed candidates (insufficient points) out of " 
+              << solutions.size() << " total sections.");
+  }
 }
 
 bool AdaptiveHoughTransformSeeder::passIntersectionsCheck(
@@ -436,6 +468,7 @@ bool AdaptiveHoughTransformSeeder::passIntersectionsCheck(
   ACTS_VERBOSE("Number of crossings inside of section " << inside);
   return inside >= threshold;
 }
+
 
 void AdaptiveHoughTransformSeeder::deduplicate(
     std::vector<Acts::Experimental::HoughAccumulatorSection> &input) const {
